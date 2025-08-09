@@ -279,7 +279,7 @@ class ShellDashGame:
                 # Check for quit command
                 if choice_input == 'Q':
                     print("Exiting game...")
-                    return  # Exit the turn and ultimately the game
+                    exit()  # Exit the entire program
                 
                 # Validate input format (single letter within valid range)
                 if len(choice_input) != 1 or choice_input < 'A' or choice_input > chr(64 + self.cols):
