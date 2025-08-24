@@ -1,6 +1,6 @@
 # Shell Dash 🐚
 
-A terminal-based card adventure game where two players race to collect 3 shell cards while navigating through randomly generated boards filled with obstacles and power-ups.
+A card adventure game where two players race to collect 3 shell cards while navigating through randomly generated boards filled with obstacles and power-ups. Available in both Python terminal and HTML web versions.
 
 **Author:** On The Margin
 
@@ -21,16 +21,28 @@ Shell Dash is a turn-based strategy game where players navigate through a grid o
 
 ## 🚀 How to Play
 
+### Python Terminal Version
 1. Run the game: `python shelldash.py`
 2. Enter player names when prompted
 3. Take turns choosing cards (A, B, or C) from each row
 4. Navigate through obstacles and collect shells
 5. First player to collect 3 shells wins!
 
+### HTML Web Version
+1. Open `shelldash.html` in your web browser
+2. Enter player names when prompted
+3. Click on cards (A, B, or C) from each row
+4. Navigate through obstacles and collect shells
+5. First player to collect 3 shells wins!
+
 ## 📋 Requirements
 
+### Python Terminal Version
 - Python 3.6+
 - Terminal with Unicode and ANSI color support
+
+### HTML Web Version
+- Modern web browser with JavaScript support
 
 ## 🎯 Game Rules
 
@@ -53,11 +65,19 @@ The game uses a 51-card deck with the following distribution:
 
 ## 🖥️ Features
 
+### Python Terminal Version
 - Colorful terminal interface with Unicode emojis
 - Dynamic board expansion
 - Player status tracking
 - Turn-based gameplay with clear visual feedback
 - Centered display formatting
+
+### HTML Web Version
+- Interactive web interface with animations
+- Responsive design for different screen sizes
+- Visual card effects and transitions
+- Click-based gameplay
+- Game state persistence during session
 
 ---
 
@@ -96,4 +116,6 @@ SOFTWARE.
 - Object-oriented programming principles
 
 This software is provided as-is for learning and educational use. Please use responsibly.
+
+**Development Note:** This project was created with the assistance of [Claude Code](https://claude.ai/code), Anthropic's interactive CLI tool for software development.
 
