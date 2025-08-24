@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell Dash - Card Game (Auto-Sync Working!)</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4fc3f7;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4fc3f7;
+        }
+        
+        .board-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .board {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 3px solid #4fc3f7;
+            min-width: 400px;
+            min-height: 300px;
+            width: fit-content;
+        }
+        
+        .board-row {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            gap: 15px;
+        }
+        
+        .card {
+            width: 100px !important;
+            height: 80px !important;
+            border: 2px solid #fff !important;
+            border-radius: 10px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            flex-shrink: 0 !important;
+            min-width: 100px !important;
+            min-height: 80px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card.hidden {
+            background: #666 !important;
+            color: white !important;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            border: 2px solid white !important;
+        }
+        
+        .card.hidden.clickable {
+            background: yellow !important;
+            cursor: pointer !important;
+            color: black !important;
+            border: 5px solid lime !important;
+            opacity: 1 !important;
+            display: flex !important;
+            visibility: visible !important;
+        }
+        
+        .card.revealed {
+            color: #000;
+        }
+        
+        .card.sand { background: #8d4e00; color: #fff; font-weight: bold; }
+        .card.wave { background: #0066cc; color: #fff; font-weight: bold; }
+        .card.flip-flop { background: #9c27b0; color: #fff; font-weight: bold; }
+        .card.jellyfish { background: #d32f2f; color: #fff; font-weight: bold; }
+        .card.sun { background: #ff8f00; color: #000; font-weight: bold; }
+        .card.shell { background: #388e3c; color: #fff; font-weight: bold; }
+        
+        .player-info {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .player-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+        
+        .player-1 { background: rgba(0, 255, 255, 0.2); border: 2px solid #00ffff; }
+        .player-2 { background: rgba(255, 255, 0, 0.2); border: 2px solid #ffff00; }
+        .player-card.current { box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+        
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        /* Setup screen buttons */
+        #setup-screen .btn {
+            background: #4fc3f7 !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 25px !important;
+            border-radius: 25px !important;
+            cursor: pointer !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            margin: 5px !important;
+            transition: all 0.3s ease !important;
+            z-index: 999999999 !important;
+            position: relative !important;
+            pointer-events: auto !important;
+            user-select: none !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Game screen buttons */
+        #game-screen .btn {
+            background: #4fc3f7 !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 25px !important;
+            border-radius: 25px !important;
+            cursor: pointer !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            margin: 5px !important;
+            transition: all 0.3s ease !important;
+            z-index: 100 !important;
+            position: relative !important;
+            pointer-events: auto !important;
+            user-select: none !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .btn:hover {
+            background: #29b6f6;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .game-log {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border-left: 4px solid #4fc3f7;
+        }
+        
+        .setup-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        #setup-screen .setup-form input {
+            padding: 10px !important;
+            margin: 10px !important;
+            border: 3px solid red !important;
+            border-radius: 5px !important;
+            background: white !important;
+            color: #333 !important;
+            font-size: 16px !important;
+            width: 200px !important;
+            cursor: text !important;
+            z-index: 999999999 !important;
+            position: relative !important;
+            pointer-events: auto !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .setup-form input:focus {
+            outline: 2px solid #4fc3f7;
+            background: rgba(255, 255, 255, 1) !important;
+        }
+        
+        .rules {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .rules h3 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
+        }
+        
+        .rules ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .rules li {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+        
+        .winner-message {
+            text-align: center;
+            font-size: 2em;
+            color: #4fc3f7;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            animation: celebration 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes celebration {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        
+        .current-row-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 15px 0;
+            color: #ffca28;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .turn-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .turn-transition.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .turn-transition-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid #4fc3f7;
+            max-width: 500px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .turn-transition.show .turn-transition-content {
+            transform: scale(1);
+        }
+        
+        .turn-reason {
+            font-size: 1.5em;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .turn-next-player {
+            font-size: 1.8em;
+            color: #4fc3f7;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐚 Shell Dash - Card Game 🐚</h1>
+        
+        <!-- Game Setup -->
+        <div id="setup-screen">
+            <div class="rules">
+                <h3>🎯 Goal & Rules:</h3>
+                <ul>
+                    <li><span class="emoji">🐚</span>Collect 3 Shell cards to win!</li>
+                    <li><span class="emoji">🏖️</span>Sand: Safe passage to next row</li>
+                    <li><span class="emoji">🌊</span>Wave: Must choose another card in same row</li>
+                    <li><span class="emoji">🩴</span>Flip-Flop: Protection against Jellyfish</li>
+                    <li><span class="emoji">🪼</span>Jellyfish: Ends turn (unless you use Flip-Flop)</li>
+                    <li><span class="emoji">☀️</span>Sun: Expands the board with 3 more rows</li>
+                </ul>
+            </div>
+            
+            <div class="setup-form">
+                <h3>Player Setup</h3>
+                <input type="text" id="player1-name" placeholder="Enter Player 1 name" maxlength="15">
+                <input type="text" id="player2-name" placeholder="Enter Player 2 name" maxlength="15">
+                <br>
+                <button class="btn" onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="player-info">
+                <div class="player-card player-1" id="player1-info">
+                    <h3 id="player1-display">Player 1</h3>
+                    <div>Shells: <span id="player1-shells">0</span>/3 🐚</div>
+                    <div>Flip-Flops: <span id="player1-flipflops">0</span> 🩴</div>
+                </div>
+                <div class="player-card player-2" id="player2-info">
+                    <h3 id="player2-display">Player 2</h3>
+                    <div>Shells: <span id="player2-shells">0</span>/3 🐚</div>
+                    <div>Flip-Flops: <span id="player2-flipflops">0</span> 🩴</div>
+                </div>
+            </div>
+            
+            <!-- Win messages at the top -->
+            <div id="winner-screen" class="hidden">
+                <div class="winner-message" id="winner-message">
+                    🎉 Winner! 🎉
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="newGame()">Play Again</button>
+                </div>
+            </div>
+            
+            <div class="current-row-indicator" id="current-row-indicator">
+                Choose a card from Row 1
+            </div>
+            
+            <div class="board-container">
+                <div class="board" id="game-board">
+                    <!-- Board will be generated dynamically -->
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="use-flipflop-btn" onclick="useFlipFlop()" disabled>Use Flip-Flop</button>
+                <button class="btn" onclick="newGame()">New Game</button>
+            </div>
+            
+            <div class="game-log" id="game-log">
+                <div>Game started! Good luck!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Turn Transition Popup -->
+    <div id="turn-transition" class="turn-transition hidden">
+        <div class="turn-transition-content">
+            <div class="turn-reason" id="turn-reason">Turn ended!</div>
+            <div class="turn-next-player" id="turn-next-player">Next Player's Turn</div>
+        </div>
+    </div>
+
+    <script>
+        class ShellDash {
+            constructor() {
+                this.cards = ['Sand', 'Wave', 'Flip-Flop', 'Jellyfish', 'Sun', 'Shell'];
+                this.cardCounts = [20, 10, 6, 6, 5, 4];
+                this.cardIcons = {
+                    'Sand': '🏖️',
+                    'Wave': '🌊',
+                    'Flip-Flop': '🩴',
+                    'Jellyfish': '🪼',
+                    'Sun': '☀️',
+                    'Shell': '🐚'
+                };
+                
+                this.board = [];
+                this.rows = 3;
+                this.cols = 3;
+                this.currentPlayer = 1;
+                this.playerNames = ["Player 1", "Player 2"];
+                this.shellCount = [0, 0];
+                this.flipFlopCount = [0, 0];
+                this.currentRow = 0;
+                this.gameOver = false;
+                this.waitingForJellyfishChoice = false;
+                
+                this.setupBoard();
+            }
+
+            createDeck() {
+                const deck = [];
+                for (let i = 0; i < this.cards.length; i++) {
+                    const cardType = this.cards[i];
+                    const count = this.cardCounts[i];
+                    for (let j = 0; j < count; j++) {
+                        deck.push(cardType);
+                    }
+                }
+                
+                // Shuffle deck
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+                
+                return deck;
+            }
+
+            setupBoard() {
+                const deck = this.createDeck();
+                this.board = [];
+                
+                for (let row = 0; row < this.rows; row++) {
+                    const boardRow = [];
+                    for (let col = 0; col < this.cols; col++) {
+                        if (deck.length > 0) {
+                            boardRow.push({ card: deck.pop(), revealed: false });
+                        } else {
+                            boardRow.push({ card: 'Sand', revealed: false });
+                        }
+                    }
+                    this.board.push(boardRow);
+                }
+                
+                console.log('Board setup complete:', this.board);
+            }
+
+            logMessage(message) {
+                const log = document.getElementById("game-log");
+                log.innerHTML += `<div>${message}</div>`;
+                log.scrollTop = log.scrollHeight;
+            }
+
+            updatePlayerDisplay() {
+                for (let i = 0; i < 2; i++) {
+                    const playerNum = i + 1;
+                    document.getElementById(`player${playerNum}-display`).innerText = this.playerNames[i];
+                    document.getElementById(`player${playerNum}-shells`).innerText = this.shellCount[i];
+                    document.getElementById(`player${playerNum}-flipflops`).innerText = this.flipFlopCount[i];
+                    
+                    const playerCard = document.getElementById(`player${playerNum}-info`);
+                    if (playerNum === this.currentPlayer) {
+                        playerCard.classList.add("current");
+                    } else {
+                        playerCard.classList.remove("current");
+                    }
+                }
+            }
+
+            renderBoard() {
+                const boardElement = document.getElementById("game-board");
+                
+                // Completely clear the board and remove all event listeners
+                while (boardElement.firstChild) {
+                    boardElement.removeChild(boardElement.firstChild);
+                }
+                
+                for (let rowIdx = 0; rowIdx < this.board.length; rowIdx++) {
+                    const row = this.board[rowIdx];
+                    const rowDiv = document.createElement("div");
+                    rowDiv.className = "board-row";
+                    
+                    for (let colIdx = 0; colIdx < row.length; colIdx++) {
+                        const cell = row[colIdx];
+                        const cardDiv = document.createElement("div");
+                        cardDiv.className = "card";
+                        
+                        if (cell.revealed) {
+                            const cardType = cell.card.toLowerCase().replace('-', '-');
+                            cardDiv.classList.add(cardType, "revealed");
+                            const icon = this.cardIcons[cell.card] || '?';
+                            cardDiv.innerHTML = `${icon}<br>${cell.card}`;
+                        } else {
+                            cardDiv.classList.add("hidden");
+                            const letter = String.fromCharCode(65 + colIdx); // A, B, C
+                            cardDiv.innerHTML = letter;
+                            
+                            // Add click handler for hidden cards in current row
+                            if (rowIdx === this.currentRow && !this.gameOver && !this.waitingForJellyfishChoice) {
+                                cardDiv.classList.add("clickable");
+                                
+                                // Apply reasonable z-index for game context
+                                cardDiv.style.zIndex = "200";
+                                cardDiv.style.pointerEvents = "auto";
+                                cardDiv.style.cursor = "pointer";
+                                
+                                // Add click handler
+                                const self = this;
+                                const handler = function(e) {
+                                    self.selectCard(colIdx);
+                                };
+                                cardDiv.addEventListener('click', handler);
+                            } else {
+                                cardDiv.style.cursor = "not-allowed";
+                                cardDiv.style.opacity = "0.5";
+                            }
+                        }
+                        
+                        rowDiv.appendChild(cardDiv);
+                    }
+                    
+                    boardElement.appendChild(rowDiv);
+                }
+                
+            }
+
+            updateCurrentRowIndicator() {
+                if (!this.gameOver) {
+                    const indicator = document.getElementById("current-row-indicator");
+                    if (this.currentRow < this.rows) {
+                        indicator.innerText = `Choose a card from Row ${this.currentRow + 1}`;
+                    } else {
+                        indicator.innerText = "Turn complete!";
+                    }
+                }
+            }
+
+            selectCard(col) {
+                if (this.gameOver || this.waitingForJellyfishChoice) {
+                    return;
+                }
+                
+                if (this.currentRow >= this.rows) {
+                    return;
+                }
+                
+                if (!this.board || !this.board[this.currentRow] || !this.board[this.currentRow][col]) {
+                    return;
+                }
+                
+                if (this.board[this.currentRow][col].revealed) {
+                    this.logMessage("Card already revealed! Choose another.");
+                    return;
+                }
+                
+                const card = this.board[this.currentRow][col].card;
+                this.board[this.currentRow][col].revealed = true;
+                
+                const icon = this.cardIcons[card] || '?';
+                this.logMessage(`${this.playerNames[this.currentPlayer-1]} revealed: ${icon} ${card}`);
+                
+                // Update the board display immediately to show the revealed card
+                this.renderBoard();
+                this.updatePlayerDisplay();
+                this.updateCurrentRowIndicator();
+                
+                // Process card with a slight delay for visual effect
+                setTimeout(() => {
+                    this.processCard(card);
+                }, 500);
+            }
+
+            processCard(card) {
+                switch (card) {
+                    case 'Sand':
+                        this.logMessage("Clear path! Advance to next row.");
+                        this.currentRow++;
+                        break;
+                        
+                    case 'Wave':
+                        this.logMessage("Wave! Must choose another card in this row.");
+                        const allRevealed = this.board[this.currentRow].every(cell => cell.revealed);
+                        if (allRevealed) {
+                            const allWaves = this.board[this.currentRow].every(cell => cell.card === 'Wave');
+                            if (allWaves) {
+                                this.logMessage("All cards in this row are waves! Turn ends.");
+                                this.endTurn("🌊 Caught in an endless wave! Turn ends!");
+                            }
+                        }
+                        break;
+                        
+                    case 'Flip-Flop':
+                        this.logMessage("Flip-Flop found! This will help with Jellyfish.");
+                        this.flipFlopCount[this.currentPlayer-1]++;
+                        this.currentRow++;
+                        break;
+                        
+                    case 'Jellyfish':
+                        if (this.flipFlopCount[this.currentPlayer-1] > 0) {
+                            this.logMessage(`Jellyfish! You have ${this.flipFlopCount[this.currentPlayer-1]} Flip-Flop(s).`);
+                            this.waitingForJellyfishChoice = true;
+                            document.getElementById("use-flipflop-btn").disabled = false;
+                            this.logMessage("Click 'Use Flip-Flop' to pass, or wait 3 seconds to get stung.");
+                            setTimeout(() => this.autoJellyfishSting(), 3000);
+                        } else {
+                            this.logMessage("Jellyfish sting! Turn ends.");
+                            this.endTurn("🪼 Jellyfish sting! Turn ends!");
+                        }
+                        break;
+                        
+                    case 'Sun':
+                        if (this.rows < 6) {
+                            this.rows += 3;
+                            this.logMessage(`Sun card! Added 3 more rows. Total rows: ${this.rows}`);
+                            
+                            const deck = this.createDeck();
+                            for (let i = 0; i < 3; i++) {
+                                const newRow = [];
+                                for (let col = 0; col < this.cols; col++) {
+                                    if (deck.length > 0) {
+                                        newRow.push({ card: deck.pop(), revealed: false });
+                                    } else {
+                                        newRow.push({ card: 'Sand', revealed: false });
+                                    }
+                                }
+                                this.board.push(newRow);
+                            }
+                        }
+                        this.currentRow++;
+                        break;
+                        
+                    case 'Shell':
+                        this.logMessage("Shell collected!");
+                        this.shellCount[this.currentPlayer-1]++;
+                        this.currentRow++;
+                        break;
+                }
+                
+                if (this.currentRow >= this.rows) {
+                    this.logMessage(`${this.playerNames[this.currentPlayer-1]} reached the end!`);
+                    this.endTurn("🏁 Reached the end! Turn complete!");
+                }
+                
+                const winner = this.checkWinner();
+                if (winner) {
+                    this.showWinner(winner);
+                }
+                
+                // Update the board display after processing the card
+                this.renderBoard();
+                this.updatePlayerDisplay(); 
+                this.updateCurrentRowIndicator();
+            }
+
+            useFlipFlop() {
+                if (!this.waitingForJellyfishChoice) {
+                    return;
+                }
+                
+                this.waitingForJellyfishChoice = false;
+                document.getElementById("use-flipflop-btn").disabled = true;
+                
+                this.logMessage("Used Flip-Flop to pass Jellyfish!");
+                this.flipFlopCount[this.currentPlayer-1]--;
+                this.currentRow++;
+                
+                if (this.currentRow >= this.rows) {
+                    this.logMessage(`${this.playerNames[this.currentPlayer-1]} reached the end!`);
+                    this.endTurn("🏁 Reached the end! Turn complete!");
+                }
+                
+                this.renderBoard();
+                this.updatePlayerDisplay();
+                this.updateCurrentRowIndicator();
+                
+                const winner = this.checkWinner();
+                if (winner) {
+                    this.showWinner(winner);
+                }
+            }
+
+            autoJellyfishSting() {
+                if (this.waitingForJellyfishChoice) {
+                    this.waitingForJellyfishChoice = false;
+                    document.getElementById("use-flipflop-btn").disabled = true;
+                    this.logMessage("Too slow! Jellyfish sting! Turn ends.");
+                    this.endTurn("⏰ Too slow! Jellyfish sting!");
+                }
+            }
+
+            endTurn(reason = "Turn ended") {
+                const nextPlayer = this.currentPlayer === 1 ? 2 : 1;
+                const nextPlayerName = this.playerNames[nextPlayer-1];
+                
+                // Show transition popup
+                this.showTurnTransition(reason, nextPlayerName);
+                
+                // Wait for popup to finish before continuing
+                setTimeout(() => {
+                    this.setupBoard();
+                    this.currentRow = 0;
+                    this.currentPlayer = nextPlayer;
+                    this.logMessage(`--- ${this.playerNames[this.currentPlayer-1]}'s turn ---`);
+                    
+                    this.renderBoard();
+                    this.updatePlayerDisplay();
+                    this.updateCurrentRowIndicator();
+                }, 3000);
+            }
+
+            checkWinner() {
+                for (let i = 0; i < this.shellCount.length; i++) {
+                    if (this.shellCount[i] >= 3) {
+                        return i + 1;
+                    }
+                }
+                return null;
+            }
+
+            showWinner(winner) {
+                this.gameOver = true;
+                const winnerName = this.playerNames[winner-1];
+                
+                const winnerScreen = document.getElementById("winner-screen");
+                const winnerMessage = document.getElementById("winner-message");
+                winnerMessage.innerHTML = `🎉 ${winnerName} wins with 3 shells! 🎉`;
+                winnerScreen.classList.remove("hidden");
+            }
+
+            showTurnTransition(reason, nextPlayerName) {
+                const transitionElement = document.getElementById("turn-transition");
+                const reasonElement = document.getElementById("turn-reason");
+                const nextPlayerElement = document.getElementById("turn-next-player");
+                
+                reasonElement.innerHTML = reason;
+                nextPlayerElement.innerHTML = `${nextPlayerName}'s Turn`;
+                
+                // Show the popup
+                transitionElement.classList.remove("hidden");
+                setTimeout(() => {
+                    transitionElement.classList.add("show");
+                }, 10);
+                
+                // Hide after 2.5 seconds 
+                setTimeout(() => {
+                    transitionElement.classList.remove("show");
+                    setTimeout(() => {
+                        transitionElement.classList.add("hidden");
+                    }, 300);
+                }, 2500);
+            }
+
+            startNewGame(player1Name, player2Name) {
+                this.playerNames = [player1Name || "Player 1", player2Name || "Player 2"];
+                this.shellCount = [0, 0];
+                this.flipFlopCount = [0, 0];
+                this.currentPlayer = 1;
+                this.currentRow = 0;
+                this.rows = 3;
+                this.gameOver = false;
+                this.waitingForJellyfishChoice = false;
+                
+                this.setupBoard();
+                
+                document.getElementById("game-log").innerHTML = "<div>Game started! Good luck!</div>";
+                this.logMessage(`--- ${this.playerNames[0]}'s turn ---`);
+                
+                document.getElementById("winner-screen").classList.add("hidden");
+                
+                this.renderBoard();
+                this.updatePlayerDisplay();
+                this.updateCurrentRowIndicator();
+            }
+        }
+
+        // Global game instance
+        let game = null;
+
+        function startGame() {
+            console.log("startGame() called");
+            
+            const player1Name = document.getElementById("player1-name").value.trim();
+            const player2Name = document.getElementById("player2-name").value.trim();
+            console.log("Player names:", player1Name, player2Name);
+            
+            console.log("Hiding setup screen, showing game screen");
+            document.getElementById("setup-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.remove("hidden");
+            
+            console.log("Creating new ShellDash game");
+            game = new ShellDash();
+            console.log("Game created:", game);
+            
+            console.log("Starting new game");
+            game.startNewGame(player1Name, player2Name);
+            console.log("Game started");
+        }
+
+        function newGame() {
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("setup-screen").classList.remove("hidden");
+            
+            document.getElementById("player1-name").value = "";
+            document.getElementById("player2-name").value = "";
+        }
+
+        function useFlipFlop() {
+            if (game) {
+                game.useFlipFlop();
+            }
+        }
+        
+        // Test if JavaScript is working
+        console.log("JavaScript loaded successfully!");
+        
+        // Test basic DOM access
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded");
+            const testElement = document.getElementById("game-log");
+            if (testElement) {
+                console.log("Found game-log element");
+                testElement.innerHTML += "<div>JavaScript is working!</div>";
+            } else {
+                console.error("Could not find game-log element");
+            }
+            
+            // Debug setup screen and inputs
+            const setupScreen = document.getElementById('setup-screen');
+            const gameScreen = document.getElementById('game-screen');
+            console.log("Setup screen visible:", !setupScreen.classList.contains('hidden'));
+            console.log("Game screen visible:", !gameScreen.classList.contains('hidden'));
+            
+            // Test input accessibility
+            const player1Input = document.getElementById('player1-name');
+            const player2Input = document.getElementById('player2-name');
+            console.log("Player 1 input found:", !!player1Input);
+            console.log("Player 2 input found:", !!player2Input);
+            
+            if (player1Input) {
+                player1Input.style.border = "3px solid red";
+                player1Input.style.zIndex = "999999";
+                player1Input.style.pointerEvents = "auto";
+                player1Input.removeAttribute("readonly");
+                player1Input.removeAttribute("disabled");
+                console.log("Player 1 input styled with red border for testing");
+                
+                // Test click event
+                player1Input.addEventListener('click', function() {
+                    console.log("Player 1 input clicked!");
+                    this.focus();
+                });
+                
+                // Test input event
+                player1Input.addEventListener('input', function() {
+                    console.log("Player 1 input changed to:", this.value);
+                });
+            }
+            if (player2Input) {
+                player2Input.style.border = "3px solid red";  
+                player2Input.style.zIndex = "999999";
+                player2Input.style.pointerEvents = "auto";
+                player2Input.removeAttribute("readonly");
+                player2Input.removeAttribute("disabled");
+                console.log("Player 2 input styled with red border for testing");
+                
+                // Test click event
+                player2Input.addEventListener('click', function() {
+                    console.log("Player 2 input clicked!");
+                    this.focus();
+                });
+                
+                // Test input event
+                player2Input.addEventListener('input', function() {
+                    console.log("Player 2 input changed to:", this.value);
+                });
+            }
+            
+            // Debug Start Game button
+            const startButton = document.querySelector('.btn[onclick="startGame()"]');
+            if (startButton) {
+                console.log("Start Game button found");
+                startButton.style.border = "3px solid lime";
+                startButton.style.zIndex = "999999";
+                startButton.style.pointerEvents = "auto";
+                
+                // Test click event
+                startButton.addEventListener('click', function(e) {
+                    console.log("Start Game button clicked!", e);
+                });
+                
+                console.log("Start Game button enhanced");
+            } else {
+                console.error("Start Game button not found!");
+            }
+        });
+    </script>
+</body>
+</html>
