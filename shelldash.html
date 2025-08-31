@@ -114,6 +114,7 @@
         .card.sand { background: #8d4e00; color: #fff; font-weight: bold; }
         .card.wave { background: #0066cc; color: #fff; font-weight: bold; }
         .card.flip-flop { background: #9c27b0; color: #fff; font-weight: bold; }
+        .card.flipflop { background: #9c27b0; color: #fff; font-weight: bold; }
         .card.jellyfish { background: #d32f2f; color: #fff; font-weight: bold; }
         .card.sun { background: #ff8f00; color: #000; font-weight: bold; }
         .card.shell { background: #388e3c; color: #fff; font-weight: bold; }
@@ -453,6 +454,7 @@
                 this.currentRow = 0;
                 this.gameOver = false;
                 this.waitingForJellyfishChoice = false;
+                this.jellyfishTimeout = null;
                 
                 this.setupBoard();
             }
@@ -536,7 +538,7 @@
                         cardDiv.className = "card";
                         
                         if (cell.revealed) {
-                            const cardType = cell.card.toLowerCase().replace('-', '-');
+                            const cardType = cell.card.toLowerCase().replace('-', '');
                             cardDiv.classList.add(cardType, "revealed");
                             const icon = this.cardIcons[cell.card] || '?';
                             cardDiv.innerHTML = `${icon}<br>${cell.card}`;
@@ -614,10 +616,8 @@
                 this.updatePlayerDisplay();
                 this.updateCurrentRowIndicator();
                 
-                // Process card with a slight delay for visual effect
-                setTimeout(() => {
-                    this.processCard(card);
-                }, 500);
+                // Process card immediately
+                this.processCard(card);
             }
 
             processCard(card) {
@@ -651,7 +651,8 @@
                             this.waitingForJellyfishChoice = true;
                             document.getElementById("use-flipflop-btn").disabled = false;
                             this.logMessage("Click 'Use Flip-Flop' to pass, or wait 3 seconds to get stung.");
-                            setTimeout(() => this.autoJellyfishSting(), 3000);
+                            if (this.jellyfishTimeout) clearTimeout(this.jellyfishTimeout);
+                            this.jellyfishTimeout = setTimeout(() => this.autoJellyfishSting(), 3000);
                         } else {
                             this.logMessage("Jellyfish sting! Turn ends.");
                             this.endTurn("🪼 Jellyfish sting! Turn ends!");
@@ -709,6 +710,7 @@
                 
                 this.waitingForJellyfishChoice = false;
                 document.getElementById("use-flipflop-btn").disabled = true;
+                if (this.jellyfishTimeout) clearTimeout(this.jellyfishTimeout);
                 
                 this.logMessage("Used Flip-Flop to pass Jellyfish!");
                 this.flipFlopCount[this.currentPlayer-1]--;
@@ -733,6 +735,7 @@
                 if (this.waitingForJellyfishChoice) {
                     this.waitingForJellyfishChoice = false;
                     document.getElementById("use-flipflop-btn").disabled = true;
+                    if (this.jellyfishTimeout) clearTimeout(this.jellyfishTimeout);
                     this.logMessage("Too slow! Jellyfish sting! Turn ends.");
                     this.endTurn("⏰ Too slow! Jellyfish sting!");
                 }
