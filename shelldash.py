@@ -5,7 +5,7 @@ class ShellDashGame:
     Shell Dash is a card-based beach adventure game where two players take turns
     navigating through a randomly generated board to collect 3 Shell cards.
     Players must avoid obstacles like Waves and Jellyfish while using special
-    cards like Flip-Flops to help them advance.
+    cards like Flip-Flops to help them advance. See https://www.manzanitagameco.com/shell-dash-card-game.html.
     """
     
     def __init__(self):
