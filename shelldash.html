@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shell Dash - Card Game (Auto-Sync Working!)</title>
+    <title>Shell Dash</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -156,15 +156,13 @@
             font-weight: bold !important;
             margin: 5px !important;
             transition: all 0.3s ease !important;
-            z-index: 999999999 !important;
-            position: relative !important;
             pointer-events: auto !important;
             user-select: none !important;
             display: inline-block !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
-        
+
         /* Game screen buttons */
         #game-screen .btn {
             background: #4fc3f7 !important;
@@ -218,14 +216,13 @@
         #setup-screen .setup-form input {
             padding: 10px !important;
             margin: 10px !important;
-            border: 3px solid red !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
             border-radius: 5px !important;
             background: white !important;
             color: #333 !important;
             font-size: 16px !important;
             width: 200px !important;
             cursor: text !important;
-            z-index: 999999999 !important;
             position: relative !important;
             pointer-events: auto !important;
             user-select: text !important;
@@ -494,7 +491,6 @@
                     this.board.push(boardRow);
                 }
                 
-                console.log('Board setup complete:', this.board);
             }
 
             logMessage(message) {
@@ -830,23 +826,14 @@
         let game = null;
 
         function startGame() {
-            console.log("startGame() called");
-            
             const player1Name = document.getElementById("player1-name").value.trim();
             const player2Name = document.getElementById("player2-name").value.trim();
-            console.log("Player names:", player1Name, player2Name);
-            
-            console.log("Hiding setup screen, showing game screen");
+
             document.getElementById("setup-screen").classList.add("hidden");
             document.getElementById("game-screen").classList.remove("hidden");
-            
-            console.log("Creating new ShellDash game");
+
             game = new ShellDash();
-            console.log("Game created:", game);
-            
-            console.log("Starting new game");
             game.startNewGame(player1Name, player2Name);
-            console.log("Game started");
         }
 
         function newGame() {
@@ -863,89 +850,6 @@
             }
         }
         
-        // Test if JavaScript is working
-        console.log("JavaScript loaded successfully!");
-        
-        // Test basic DOM access
-        window.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM loaded");
-            const testElement = document.getElementById("game-log");
-            if (testElement) {
-                console.log("Found game-log element");
-                testElement.innerHTML += "<div>JavaScript is working!</div>";
-            } else {
-                console.error("Could not find game-log element");
-            }
-            
-            // Debug setup screen and inputs
-            const setupScreen = document.getElementById('setup-screen');
-            const gameScreen = document.getElementById('game-screen');
-            console.log("Setup screen visible:", !setupScreen.classList.contains('hidden'));
-            console.log("Game screen visible:", !gameScreen.classList.contains('hidden'));
-            
-            // Test input accessibility
-            const player1Input = document.getElementById('player1-name');
-            const player2Input = document.getElementById('player2-name');
-            console.log("Player 1 input found:", !!player1Input);
-            console.log("Player 2 input found:", !!player2Input);
-            
-            if (player1Input) {
-                player1Input.style.border = "3px solid red";
-                player1Input.style.zIndex = "999999";
-                player1Input.style.pointerEvents = "auto";
-                player1Input.removeAttribute("readonly");
-                player1Input.removeAttribute("disabled");
-                console.log("Player 1 input styled with red border for testing");
-                
-                // Test click event
-                player1Input.addEventListener('click', function() {
-                    console.log("Player 1 input clicked!");
-                    this.focus();
-                });
-                
-                // Test input event
-                player1Input.addEventListener('input', function() {
-                    console.log("Player 1 input changed to:", this.value);
-                });
-            }
-            if (player2Input) {
-                player2Input.style.border = "3px solid red";  
-                player2Input.style.zIndex = "999999";
-                player2Input.style.pointerEvents = "auto";
-                player2Input.removeAttribute("readonly");
-                player2Input.removeAttribute("disabled");
-                console.log("Player 2 input styled with red border for testing");
-                
-                // Test click event
-                player2Input.addEventListener('click', function() {
-                    console.log("Player 2 input clicked!");
-                    this.focus();
-                });
-                
-                // Test input event
-                player2Input.addEventListener('input', function() {
-                    console.log("Player 2 input changed to:", this.value);
-                });
-            }
-            
-            // Debug Start Game button
-            const startButton = document.querySelector('.btn[onclick="startGame()"]');
-            if (startButton) {
-                console.log("Start Game button found");
-                startButton.style.border = "3px solid lime";
-                startButton.style.zIndex = "999999";
-                startButton.style.pointerEvents = "auto";
-                
-                // Test click event
-                startButton.addEventListener('click', function(e) {
-                    console.log("Start Game button clicked!", e);
-                });
-                
-                console.log("Start Game button enhanced");
-            } else {
-                console.error("Start Game button not found!");
-            }
-        });
     </script>
 </body>
 </html>
