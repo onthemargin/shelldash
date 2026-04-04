@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.log
+.env
+.DS_Store
+
+# Claude Code
+CLAUDE.md
+.claude/
+.claudeignore
