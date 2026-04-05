@@ -515,6 +515,12 @@ describe('renderBoard mobile support', () => {
         };
     }
 
+    it('no inline onclick handlers in HTML (CSP compliance)', () => {
+        const html = fs.readFileSync(path.join(__dirname, 'shelldash.html'), 'utf-8');
+        const onclickMatches = html.match(/onclick\s*=/gi) || [];
+        assert.equal(onclickMatches.length, 0, 'HTML should not use inline onclick handlers (blocked by CSP script-src self)');
+    });
+
     it('attaches touchend listeners to clickable cards', () => {
         // Load a fresh instance with tracking DOM
         const src = fs.readFileSync(path.join(__dirname, 'shelldash.js'), 'utf-8');
