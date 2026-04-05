@@ -439,7 +439,7 @@
                 <input type="text" id="player1-name" placeholder="Enter Player 1 name" maxlength="15">
                 <input type="text" id="player2-name" placeholder="Enter Player 2 name" maxlength="15">
                 <br>
-                <button class="btn" onclick="startGame()">Start Game</button>
+                <button class="btn" id="start-game-btn">Start Game</button>
             </div>
         </div>
         
@@ -464,7 +464,7 @@
                     🎉 Winner! 🎉
                 </div>
                 <div class="controls">
-                    <button class="btn" onclick="newGame()">Play Again</button>
+                    <button class="btn" id="play-again-btn">Play Again</button>
                 </div>
             </div>
             
@@ -479,8 +479,8 @@
             </div>
             
             <div class="controls">
-                <button class="btn" id="use-flipflop-btn" onclick="useFlipFlop()" disabled>Use Flip-Flop</button>
-                <button class="btn" onclick="newGame()">New Game</button>
+                <button class="btn" id="use-flipflop-btn" disabled>Use Flip-Flop</button>
+                <button class="btn" id="new-game-btn">New Game</button>
             </div>
             
             <div class="game-log" id="game-log">

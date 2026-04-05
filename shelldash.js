@@ -423,3 +423,9 @@ function useFlipFlop() {
         game.useFlipFlop();
     }
 }
+
+// Wire up button event listeners (CSP blocks inline onclick handlers)
+document.getElementById("start-game-btn").addEventListener("click", startGame);
+document.getElementById("play-again-btn").addEventListener("click", newGame);
+document.getElementById("new-game-btn").addEventListener("click", newGame);
+document.getElementById("use-flipflop-btn").addEventListener("click", useFlipFlop);
