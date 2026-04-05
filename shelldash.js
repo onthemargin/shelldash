@@ -122,12 +122,16 @@ class ShellDash {
                         cardDiv.style.pointerEvents = "auto";
                         cardDiv.style.cursor = "pointer";
 
-                        // Add click handler
+                        // Add click and touch handlers for mobile support
                         const self = this;
                         const handler = function(e) {
                             self.selectCard(colIdx);
                         };
                         cardDiv.addEventListener('click', handler);
+                        cardDiv.addEventListener('touchend', function(e) {
+                            e.preventDefault();
+                            self.selectCard(colIdx);
+                        });
                     } else {
                         cardDiv.style.cursor = "not-allowed";
                         cardDiv.style.opacity = "0.5";

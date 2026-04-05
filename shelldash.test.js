@@ -457,3 +457,88 @@ describe('startNewGame', () => {
         assert.equal(game.currentPlayer, 1);
     });
 });
+
+// ---------------------------------------------------------------------------
+// renderBoard() — touch event support for mobile
+// ---------------------------------------------------------------------------
+
+describe('renderBoard mobile support', () => {
+    /** Helper: create a richer mock DOM that tracks event listeners */
+    function createTrackingDOM() {
+        const elements = {};
+        const createdElements = [];
+
+        const mockElement = (id) => {
+            const listeners = {};
+            const el = {
+                id,
+                innerHTML: '',
+                innerText: '',
+                value: '',
+                scrollTop: 0,
+                scrollHeight: 0,
+                style: {},
+                className: '',
+                classList: {
+                    _classes: new Set(),
+                    add(c) { this._classes.add(c); },
+                    remove(c) { this._classes.delete(c); },
+                    contains(c) { return this._classes.has(c); },
+                },
+                children: [],
+                firstChild: null,
+                removeChild() { this.firstChild = null; this.children = []; },
+                appendChild(child) { this.children.push(child); this.firstChild = this.firstChild || child; },
+                addEventListener(event, handler) {
+                    if (!listeners[event]) listeners[event] = [];
+                    listeners[event].push(handler);
+                },
+                _listeners: listeners,
+                disabled: false,
+            };
+            return el;
+        };
+
+        return {
+            getElementById(id) {
+                if (!elements[id]) {
+                    elements[id] = mockElement(id);
+                }
+                return elements[id];
+            },
+            createElement() {
+                const el = mockElement('_dynamic_' + createdElements.length);
+                createdElements.push(el);
+                return el;
+            },
+            _createdElements: createdElements,
+        };
+    }
+
+    it('attaches touchend listeners to clickable cards', () => {
+        // Load a fresh instance with tracking DOM
+        const src = fs.readFileSync(path.join(__dirname, 'shelldash.js'), 'utf-8');
+        const trackingDoc = createTrackingDOM();
+        const patchedSrc = src + '\nthis.ShellDash = ShellDash;\n';
+        const context = vm.createContext({
+            document: trackingDoc,
+            console,
+            setTimeout: globalThis.setTimeout,
+            clearTimeout: globalThis.clearTimeout,
+            String, Math, Array, JSON, Object, Set,
+        });
+        vm.runInContext(patchedSrc, context);
+        const SD = context.ShellDash;
+
+        const game = new SD();
+        game.startNewGame('A', 'B');
+
+        // Find card elements created for the current row (row 0)
+        // Cards in current row should have both click and touchend listeners
+        const cardElements = trackingDoc._createdElements.filter(el =>
+            el._listeners['touchend'] && el._listeners['touchend'].length > 0
+        );
+
+        assert.ok(cardElements.length > 0, 'Clickable cards should have touchend listeners for mobile');
+    });
+});
